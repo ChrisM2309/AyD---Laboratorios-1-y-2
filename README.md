@@ -1,6 +1,6 @@
 # Laboratorio 1 y 2 – Sistema de Reservas y Tutorías
 
-Estos laboratorios, en conjutno constan de **tres partes**
+Estos laboratorios, en conjunto constan de **tres partes**
 
 ---
 
@@ -100,7 +100,7 @@ Se ejecutan **dos pruebas**, las cuales finalizan correctamente **sin errores**.
 
 ---
 
-## 🚀 Ejecución del servidor
+## Ejecución del servidor
 
 ```bash
 python -m uvicorn app.api.main:app --reload
