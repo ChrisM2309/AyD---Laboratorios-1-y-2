@@ -1,7 +1,8 @@
--- Crear objetos y buscar violaciones de las reglas 
+-- script para tutorias 
 
--- creano objetos base
+-- Crear objetos y provocar violaciones
 
+-- 1) Objetos base
 !create t1 : Tutor
 !set t1.nombre := 'Carlos Tutor'
 !set t1.especialidad := 'Arquitectura'
@@ -10,8 +11,7 @@
 !set e1.nombre := 'Ana Estudiante'
 !set e1.carnet := 'AB2026'
 
--- creando disponibilidades
-
+-- 2) Disponibilidades
 !create d1 : Disponibilidad
 !set d1.fechaHora := '2026-01-20T10:00'
 !set d1.estado := #LIBRE
@@ -22,18 +22,16 @@
 !set d2.estado := #OCUPADA
 !insert (t1, d2) into TutorDisponibilidad
 
--- creando una reserva valida
-
+-- 3) Reserva valida
 !create r1 : Reserva
 !set r1.fechaHora := '2026-01-20T10:00'
 !set r1.estado := #CONFIRMADA
 !insert (t1, r1) into TutorReserva
 !insert (e1, r1) into EstudianteReserva
 
--- creando reserva duplicada, usando el mismo valor de fechaHora
-
+-- 4) Reserva duplicada (misma fechaHora)
 !create r2 : Reserva
 !set r2.fechaHora := '2026-01-20T10:00'
-!set r2.estado := #CREADA
+!set r2.estado := #CANCELADA
 !insert (t1, r2) into TutorReserva
 !insert (e1, r2) into EstudianteReserva

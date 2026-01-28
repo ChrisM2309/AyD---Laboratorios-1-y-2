@@ -1,13 +1,13 @@
+-- modelo 4 - tutorias 
+
 model Tutorias
 
--- ENUM de estados para reservas, disponibilidad, pagos 
+-- ENUMS
 enum EstadoReserva { CREADA, CANCELADA, CONFIRMADA, EXPIRADA } 
 enum EstadoDisponibilidad { LIBRE, OCUPADA }
 enum EstadoPago { PENDIENTE, PAGADO, REEMBOLSADO }
 
--- Clases del sistema Tutor
-
--- Clases de personas
+-- Clases
 class Tutor
 attributes
   nombre : String
@@ -19,8 +19,6 @@ attributes
   nombre : String
   carnet : String
 end
-
--- Clases de temas, servicios o secundarios 
 
 class Curso
 attributes
@@ -51,8 +49,6 @@ attributes
   estado : EstadoReserva
 end
 
--- Clases de sistemas que se usaran 
-
 class Pago
 attributes
   monto : Real
@@ -71,7 +67,7 @@ operations
   cancelarReserva(reserva : Reserva)
 end
 
--- Asociaciones entre las clases 
+-- Asociaciones
 
 association TutorReserva between
   Tutor[1] role tutor
@@ -113,13 +109,11 @@ association ReservaNotificacion between
   Notificacion[*] role notificaciones
 end
 
--- IMPORTANTE**** --> AGREGAR AQUI LAS CONSTRAINTS, para que funcione 
-
 constraints
 
--- 3 invariantes  
+-- 3 invariantes
 
--- 1. Estado valido de reserva
+-- Inv #1 Estado valido de reserva
 
 context Reserva
   inv EstadoValido:
@@ -128,13 +122,13 @@ context Reserva
          EstadoReserva::CANCELADA,
          EstadoReserva::EXPIRADA }->includes(self.estado)
 
--- 2. Cardinalidad logica - un tutor y un estudiante
+-- Inv #2 Cardinalidad logica (una reserva debe tener un tutor y un estudiante)
 
 context Reserva
   inv TieneTutorYEstudiante:
     not self.tutor.oclIsUndefined() and not self.estudiante.oclIsUndefined()
 
--- 3. Unicidad -- no puede tener mas de 1 reserva al mismo tiempo 
+-- Inv #3 Unicidad (un tutor no puede tener 2 reservas a la misma fechaHora)
 
 context Tutor
   inv NoDobleReservaActivaMismoHorario:
@@ -142,10 +136,9 @@ context Tutor
       ->select(r | r.estado <> EstadoReserva::CANCELADA and r.estado <> EstadoReserva::EXPIRADA)
       ->isUnique(r | r.fechaHora)
 
+-- Precondiciones (crear/cancelar)
 
--- Precondiciones para crear/cancelar
-
--- 1. Crear --> existir disponibilidad libre y no violar Unicidad
+-- Pre #1 (crear) - debe existir disponibilidad libre y nodebe violar Unicidad
 
 context ReservaService::crearReserva(estudiante : Estudiante, tutor : Tutor, fechaHora : String) : Reserva
   pre PuedeCrearReserva:
@@ -157,7 +150,7 @@ context ReservaService::crearReserva(estudiante : Estudiante, tutor : Tutor, fec
       ->select(r | r.estado <> EstadoReserva::CANCELADA and r.estado <> EstadoReserva::EXPIRADA)
       ->forAll(r | r.fechaHora <> fechaHora)
 
--- 2. Cancelar --> solo cancelar si esta activo 
+-- Pre #2 (cancelar) - solo se puede cancelar una reserva activa
 
 context ReservaService::cancelarReserva(reserva : Reserva)
   pre PuedeCancelar:
@@ -165,7 +158,7 @@ context ReservaService::cancelarReserva(reserva : Reserva)
 
 -- Postcondiciones
 
--- 1. Al crear una reserva, su estado es creada y tiene un tutor + estudiante 
+-- Post #1 - si creas una reserva, queda en creada y ligada a un tutor/estudiante
 
 context ReservaService::crearReserva(estudiante : Estudiante, tutor : Tutor, fechaHora : String) : Reserva
   post ReservaQuedaCreada:
